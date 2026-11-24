@@ -1,0 +1,8 @@
+name = "React Router"
+roles = ["frontend", "backend"]
+webhooks_path = "/webhooks/app/uninstalled"
+
+[commands]
+predev = "npm exec prisma generate"
+# setup-db.mjs fills in DATABASE_URL (prisma/dev.sqlite locally) and runs the migrations.
+dev = "node scripts/setup-db.mjs && npm exec react-router dev"

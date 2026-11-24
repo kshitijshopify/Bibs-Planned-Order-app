@@ -1,0 +1,138 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// Note that some adapters may set a maximum length for the String type by default, please ensure your strings are long
+// enough when changing adapters.
+// See https://www.prisma.io/docs/orm/reference/prisma-schema-reference#string for more information
+// DATABASE_URL is filled in by app/database-url.js when it isn't set:
+//   local:  file:dev.sqlite (prisma/dev.sqlite)
+//   Render: file:/var/data/prod.sqlite (persistent disk)
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id            String    @id
+  shop          String
+  state         String
+  isOnline      Boolean   @default(false)
+  scope         String?
+  expires       DateTime?
+  accessToken   String
+  userId        BigInt?
+  firstName     String?
+  lastName      String?
+  email         String?
+  accountOwner  Boolean   @default(false)
+  locale        String?
+  collaborator  Boolean?  @default(false)
+  emailVerified Boolean?  @default(false)
+  refreshToken        String?
+  refreshTokenExpires DateTime?
+}
+
+// One row per planned variant of one customer (individual login, never shared
+// by the company). Ids are Shopify numeric ids as strings.
+model PlanItem {
+  id          Int      @id @default(autoincrement())
+  shop        String
+  customerId  String
+  variantId   String
+  productId   String?
+  handle      String
+  title       String   @default("")
+  quantity    Int
+  // Distributor ordering date (YYYY-MM-DD) the customer last saw; "" = orderable.
+  releaseDate String   @default("")
+  // "p" = planned / waiting for the customer, "d" = released but kept for later.
+  state       String   @default("p")
+  // First nightly check that found the product hidden for this customer. It is
+  // removed only if the next check (a day later) still can't find it.
+  missingSince DateTime?
+  addedAt     DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([shop, customerId, variantId])
+  @@index([shop, productId])
+  @@index([shop, releaseDate])
+}
+
+// Per-customer details: profile for the admin lists and emails, pending cart
+// messages (JSON array) and when the browser-only plan was imported.
+model PlanCustomer {
+  id          Int       @id @default(autoincrement())
+  shop        String
+  customerId  String
+  email       String?
+  name        String?
+  companyName String?
+  profileAt   DateTime?
+  notices     String    @default("[]")
+  // Last time the customer's items changed (the admin's "last update").
+  planUpdatedAt DateTime?
+  migratedAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@unique([shop, customerId])
+}
+
+// Date changes, removals, imports and (later) emails, for the admin activity log.
+model ActivityLog {
+  id         Int      @id @default(autoincrement())
+  shop       String
+  type       String
+  source     String   @default("")
+  customerId String?
+  productId  String?
+  variantId  String?
+  title      String?
+  details    String   @default("{}")
+  createdAt  DateTime @default(now())
+
+  @@index([shop, createdAt])
+  @@index([shop, customerId])
+}
+
+// Per-shop settings changed in the app (emails start switched off).
+model AppSettings {
+  shop          String   @id
+  emailsEnabled Boolean  @default(false)
+  // https://store-domain, for product and cart links in emails.
+  storefrontUrl String?
+  updatedBy     String?
+  updatedAt     DateTime @updatedAt
+}
+
+// One customer email (a Klaviyo event that a flow turns into the email).
+// uniqueId is also Klaviyo's unique_id, so the same change never emails twice.
+model EmailEvent {
+  id            Int       @id @default(autoincrement())
+  shop          String
+  customerId    String
+  email         String?
+  kind          String    // date_changed | removed | test
+  metric        String
+  uniqueId      String
+  productId     String?
+  title         String?
+  properties    String    @default("{}")
+  // pending | sent | failed | skipped
+  status        String    @default("pending")
+  error         String?
+  attempts      Int       @default(0)
+  lastAttemptAt DateTime?
+  sentAt        DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  @@unique([shop, uniqueId])
+  @@index([shop, status])
+  @@index([shop, createdAt])
+  @@index([shop, customerId])
+}

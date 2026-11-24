@@ -1,0 +1,31 @@
+query CartValidationsGenerateRunInput {
+  buyerJourney {
+    step
+  }
+  shop {
+    localTime {
+      date
+    }
+  }
+  localization {
+    language {
+      isoCode
+    }
+  }
+  cart {
+    lines {
+      merchandise {
+        __typename
+        ... on ProductVariant {
+          product {
+            id
+            title
+            releaseDate: metafield(namespace: "custom", key: "distributor_order_release_date") {
+              value
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,4 @@
+{
+  "name": "Planned orders: ordering date",
+  "description": "Blocks checkout for products whose distributor ordering date (custom.distributor_order_release_date) is still in the future."
+}

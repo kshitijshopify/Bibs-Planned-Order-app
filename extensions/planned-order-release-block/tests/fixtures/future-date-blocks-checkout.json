@@ -1,0 +1,61 @@
+{
+  "payload": {
+    "export": "cart-validations-generate-run",
+    "target": "cart.validations.generate.run",
+    "input": {
+      "buyerJourney": {
+        "step": "CHECKOUT_COMPLETION"
+      },
+      "shop": {
+        "localTime": {
+          "date": "2026-11-18"
+        }
+      },
+      "localization": {
+        "language": {
+          "isoCode": "EN"
+        }
+      },
+      "cart": {
+        "lines": [
+          {
+            "merchandise": {
+              "__typename": "ProductVariant",
+              "product": {
+                "id": "gid://shopify/Product/1",
+                "title": "Pacifier Supreme",
+                "releaseDate": {
+                  "value": "2027-02-15"
+                }
+              }
+            }
+          },
+          {
+            "merchandise": {
+              "__typename": "ProductVariant",
+              "product": {
+                "id": "gid://shopify/Product/2",
+                "title": "Bottle",
+                "releaseDate": null
+              }
+            }
+          }
+        ]
+      }
+    },
+    "output": {
+      "operations": [
+        {
+          "validationAdd": {
+            "errors": [
+              {
+                "message": "“Pacifier Supreme” can't be ordered before 15/02/2027. Remove it from this order to continue.",
+                "target": "$.cart"
+              }
+            ]
+          }
+        }
+      ]
+    }
+  }
+}

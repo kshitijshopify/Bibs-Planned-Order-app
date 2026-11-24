@@ -1,0 +1,85 @@
+# PRODUCTION config (BIBS store, hosted on Render).
+# Deploy with: npm run deploy:prod   (checks this file, then: shopify app deploy --config bibs-planned-order)
+#
+# application_url MUST be the Render web service URL (Render → bibs-planned-order
+# → the .onrender.com address at the top) and the same as SHOPIFY_APP_URL on
+# Render. Change the three redirect_urls too. scopes, [app_proxy], [webhooks]
+# and [events] must stay the same as shopify.app.toml (tests/config.test.js
+# checks it).
+
+client_id = "c6bfd545287261f49548bea9bf75e7f8"
+name = "bibs-planned-order-app"
+application_url = "https://bibs-planned-order.onrender.com"
+embedded = true
+
+[access_scopes]
+# write_app_proxy -> the theme talks to the app at /apps/planned-order/...
+# read_products   -> variant -> product, handle, title and the
+#                    custom.distributor_order_release_date metafield
+# read_customers  -> customer name, email and company for the admin lists and
+#                    emails, B2B company locations (also needs "Protected
+#                    customer data access" in the Dev Dashboard)
+# read_publications -> nightly check: is the product in the customer's B2B
+#                    catalogue (catalog publication)?
+scopes = "write_app_proxy,read_products,read_customers,read_publications"
+
+[app_proxy]
+# Storefront /apps/planned-order/* is forwarded to the app's /proxy/* routes.
+# Shopify signs every request and adds logged_in_customer_id.
+url = "/proxy"
+prefix = "apps"
+subpath = "planned-order"
+
+[webhooks]
+api_version = "2026-10"
+
+  [[webhooks.subscriptions]]
+  uri = "/webhooks/app/uninstalled"
+  topics = [ "app/uninstalled" ]
+
+  [[webhooks.subscriptions]]
+  uri = "/webhooks/app/scopes_update"
+  topics = [ "app/scopes_update" ]
+
+  # Product deleted: it leaves every plan (cart message + email).
+  [[webhooks.subscriptions]]
+  uri = "/webhooks/products/delete"
+  topics = [ "products/delete" ]
+
+  # Customer deleted: their plan and email rows are deleted.
+  [[webhooks.subscriptions]]
+  uri = "/webhooks/customers/delete"
+  topics = [ "customers/delete" ]
+
+[events]
+api_version = "2026-10"
+
+  # Fires only when the ordering-date metafield value changes. The app reads the
+  # product's current state, so the query only needs to name the product.
+  [[events.subscription]]
+  handle = "release-date-changed"
+  topic = "Product"
+  actions = [ "update" ]
+  triggers = [ "product.metafield(namespace: 'custom', key: 'distributor_order_release_date').value" ]
+  uri = "/webhooks/products/release-date"
+  query = """
+  query release_date_changed($productId: ID!, $metafieldNamespace: String!, $metafieldKey: String!) {
+    product(id: $productId) {
+      id
+      metafield(namespace: $metafieldNamespace, key: $metafieldKey) {
+        value
+      }
+    }
+  }
+  """
+
+[auth]
+redirect_urls = [
+  "https://bibs-planned-order.onrender.com/auth/callback",
+  "https://bibs-planned-order.onrender.com/auth/shopify/callback",
+  "https://bibs-planned-order.onrender.com/api/auth/callback"
+]
+
+[build]
+include_config_on_deploy = true
+automatically_update_urls_on_dev = false

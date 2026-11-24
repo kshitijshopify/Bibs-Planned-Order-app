@@ -1,0 +1,68 @@
+{
+  "payload": {
+    "export": "cart-validations-generate-run",
+    "target": "cart.validations.generate.run",
+    "input": {
+      "buyerJourney": {
+        "step": "CHECKOUT_COMPLETION"
+      },
+      "shop": {
+        "localTime": {
+          "date": "2026-11-18"
+        }
+      },
+      "localization": {
+        "language": {
+          "isoCode": "EN"
+        }
+      },
+      "cart": {
+        "lines": [
+          {
+            "merchandise": {
+              "__typename": "ProductVariant",
+              "product": {
+                "id": "gid://shopify/Product/1",
+                "title": "Bottle",
+                "releaseDate": null
+              }
+            }
+          },
+          {
+            "merchandise": {
+              "__typename": "ProductVariant",
+              "product": {
+                "id": "gid://shopify/Product/2",
+                "title": "Loops",
+                "releaseDate": {
+                  "value": ""
+                }
+              }
+            }
+          },
+          {
+            "merchandise": {
+              "__typename": "ProductVariant",
+              "product": {
+                "id": "gid://shopify/Product/3",
+                "title": "Odd",
+                "releaseDate": {
+                  "value": "soon"
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "output": {
+      "operations": [
+        {
+          "validationAdd": {
+            "errors": []
+          }
+        }
+      ]
+    }
+  }
+}
