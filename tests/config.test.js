@@ -97,6 +97,14 @@ test("config drift between dev and production is caught", () => {
   assert.match(check(prodToml.replace("automatically_update_urls_on_dev = false", "automatically_update_urls_on_dev = true")), /must be false/);
 });
 
+test("the dev config can't release example.com: same app, so its URLs must be the production ones", () => {
+  const dev = readAppConfig(devToml);
+  assert.equal(dev.applicationUrl, readAppConfig(prodToml).applicationUrl);
+  assert.equal(dev.updateUrlsOnDev, "true");
+  const exampleDev = devToml.replaceAll("https://bibs-planned-order-app.onrender.com", "https://example.com");
+  assert.match(checkProductionConfig({ prodToml, devToml: exampleDev }).errors.join("\n"), /plain `shopify app deploy`/);
+});
+
 test("Render env files are checked against the app config", () => {
   const check = (web, cron = sampleCronEnv()) => checkProductionConfig({ prodToml, devToml, webEnv: web, cronEnv: cron });
   assert.deepEqual(check(sampleWebEnv()).errors, []);

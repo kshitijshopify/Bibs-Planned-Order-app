@@ -1,7 +1,7 @@
 # PRODUCTION config (BIBS store, hosted on Render).
 # Deploy with: npm run deploy:prod   (checks this file, then: shopify app deploy --config bibs-planned-order)
 #
-# application_url MUST be the Render web service URL (Render → bibs-planned-order
+# application_url MUST be the Render web service URL (Render → bibs-planned-order-app
 # → the .onrender.com address at the top) and the same as SHOPIFY_APP_URL on
 # Render. Change the three redirect_urls too. scopes, [app_proxy], [webhooks]
 # and [events] must stay the same as shopify.app.toml (tests/config.test.js

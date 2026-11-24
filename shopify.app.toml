@@ -1,9 +1,14 @@
 # LOCAL DEVELOPMENT config: `shopify app dev` on the dev store (kt-apps-test). The preview stays on that store.
 # Production (BIBS store, Render) is shopify.app.bibs-planned-order.toml. https://shopify.dev/docs/apps/tools/cli/configuration
+#
+# Same app (client_id) as production, so a plain `shopify app deploy` releases THIS file to every store.
+# That's why application_url and redirect_urls are the Render ones here too (never example.com):
+# `shopify app dev` swaps in its tunnel URL for the dev preview only (automatically_update_urls_on_dev).
+# Deploy with `npm run deploy` (= deploy:prod).
 
 client_id = "c6bfd545287261f49548bea9bf75e7f8"
 name = "bibs-planned-order-app"
-application_url = "https://example.com"
+application_url = "https://bibs-planned-order-app.onrender.com"
 embedded = true
 
 [access_scopes]
@@ -68,7 +73,11 @@ api_version = "2026-10"
   """
 
 [auth]
-redirect_urls = [ "https://example.com/api/auth" ]
+redirect_urls = [
+  "https://bibs-planned-order-app.onrender.com/auth/callback",
+  "https://bibs-planned-order-app.onrender.com/auth/shopify/callback",
+  "https://bibs-planned-order-app.onrender.com/api/auth/callback"
+]
 
 [build]
 automatically_update_urls_on_dev = true

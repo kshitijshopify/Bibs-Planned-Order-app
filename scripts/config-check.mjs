@@ -114,6 +114,12 @@ export function checkProductionConfig({ prodToml, devToml, renderYaml = null, we
   same("[app_proxy]", dev.proxy, prod.proxy);
   same("webhook subscriptions", dev.webhooks, prod.webhooks);
   same("event subscriptions", dev.events, prod.events);
+  // Same client_id: a plain `shopify app deploy` releases shopify.app.toml to every store,
+  // so its URLs must be the production ones too (app dev uses its tunnel regardless).
+  if (dev.clientId === prod.clientId) {
+    same("application_url / redirect_urls (a plain `shopify app deploy` uses shopify.app.toml)",
+      { url: dev.applicationUrl, redirects: dev.redirectUrls }, { url: prod.applicationUrl, redirects: prod.redirectUrls });
+  }
   if (renderYaml) same("SCOPES in render.yaml and the app scopes", renderScopes(renderYaml), prod.scopes);
   if (webEnv) checkRenderEnv({ prod, webEnv, cronEnv, errors, warnings });
   if (prod.proxy.url && /^https?:/.test(prod.proxy.url)) {
