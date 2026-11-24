@@ -1,3 +1,4 @@
+/* eslint-env node */
 // Called once a day by the scheduler (Render Cron Job), e.g. 01:00 UTC.
 // Env: SHOPIFY_APP_URL (same value as the web service) and
 //      PLANNED_ORDER_CRON_SECRET (same value as the web service).

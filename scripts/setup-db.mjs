@@ -1,3 +1,4 @@
+/* eslint-env node */
 // Applies the database migrations (`prisma migrate deploy`) before the app
 // starts (`npm run setup`). DATABASE_URL is optional: the same default as the
 // app is used (Render disk /var/data/prod.sqlite, else prisma/dev.sqlite).

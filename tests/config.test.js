@@ -14,7 +14,7 @@ const renderYaml = readSetup("render.yaml");
 const webEnv = readSetup("web-service.env");
 const cronEnv = readSetup("cron-job.env");
 
-const APP_URL = "https://bibs-planned-order.onrender.com";
+const APP_URL = "https://bibs-planned-order-app.onrender.com";
 const SECRET = "x".repeat(32);
 const sampleWebEnv = (overrides = {}) =>
   Object.entries({
@@ -76,7 +76,7 @@ test("render-setup (local): env files match the production config", { skip: !has
 // ---- the checker itself ------------------------------------------------------------------
 
 const withUrl = (url) =>
-  prodToml.replaceAll("https://bibs-planned-order.onrender.com", url);
+  prodToml.replaceAll("https://bibs-planned-order-app.onrender.com", url);
 
 test("placeholder or mismatched URLs stop the deploy", () => {
   const check = (toml, appUrl) => checkProductionConfig({ prodToml: toml, devToml, appUrl }).errors.join("\n");
@@ -84,8 +84,8 @@ test("placeholder or mismatched URLs stop the deploy", () => {
   assert.match(check(withUrl("https://abc.trycloudflare.com")), /placeholder/);
   assert.match(check(withUrl("http://bibs.onrender.com")), /https/);
   assert.match(check(prodToml, "https://other.onrender.com"), /differ/);
-  assert.equal(check(prodToml, "https://bibs-planned-order.onrender.com/"), "");
-  const badRedirect = prodToml.replace("https://bibs-planned-order.onrender.com/api/auth/callback", "https://x.com/api/auth/callback");
+  assert.equal(check(prodToml, "https://bibs-planned-order-app.onrender.com/"), "");
+  const badRedirect = prodToml.replace("https://bibs-planned-order-app.onrender.com/api/auth/callback", "https://x.com/api/auth/callback");
   assert.match(check(badRedirect), /redirect_url/);
 });
 
